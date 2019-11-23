@@ -1,0 +1,4 @@
+
+database_name: team_cooperation
+database_username: team_cooperation
+database_password: iLDDHlNEBLvKEvT2
