@@ -1,4 +1,28 @@
+# Team Cooperation
 
-database_name: team_cooperation
-database_username: team_cooperation
-database_password: iLDDHlNEBLvKEvT2
+* modules
+    * kanban
+    * calendar
+    * user_manage
+    * document_manage
+    * drive
+
+* api
+    * base
+        * login  
+
+        | url  | method | request body | response |
+        |  ----  | ----  | ----  | ----  |
+        | /user/login | POST | { username: string,  password: string } | { succeed: boolean, info: string, obj?: any } |
+
+        * register
+        
+        | url  | method | request body | response |
+        |  ----  | ----  | ----  | ----  |
+        | /user/register | POST | { username: string,  password: string, passwordAttirm: string } | { succeed: boolean, info: string, obj?: any } |
+
+        * logout 
+
+        | url  | method | request body | response |
+        |  ----  | ----  | ----  | ----  |
+        | /user/logout | GET | {} | 'logout page!' |
