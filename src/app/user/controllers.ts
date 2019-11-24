@@ -13,21 +13,26 @@ export class UserContorl {
         this.db = new DB('team_cooperation', 'root', '', 'localhost');
     }
 
-    async login(ctx: any) {
+    getUserByName(username: string) {
+        let result = this.db.connect('users').where({username: username}).get();
+        result.then((data: any) => {
+            return data[0];
+        }).catch((err) => {
+            throw err;
+        });
+    }
+
+    login = async (ctx: any) => {
         try {
             let requestBody = ctx.request.body;
             if (requestBody.username && requestBody.password) {
-                const result = this.db.connect('users').where({username: requestBody.username}).get(); 
-                result.then((data: any) => {
-                    if (data[0].password === md5(requestBody.password + 'wOkkLtKMaXA9MIZq')) {
-                        ctx.session.username = data[0].username;
-                        ctx.body = { succeed: true, info: 'Login successfully.'};
-                    } else {
-                        ctx.body = { succeed: false, info: 'Username or password is error.'};
-                    }                
-                }).catch((err) => {
-                    ctx.body = { succeed: false, info: 'Login error.', obj: err };
-                });
+                let user = (await this.db.connect('users').where({username: requestBody.username}).get()).info[0];
+                if (user.password === md5(requestBody.password + 'wOkkLtKMaXA9MIZq')) {
+                    ctx.session.username = user.username;
+                    ctx.body = { succeed: true, info: 'Login successfully.'};
+                } else {
+                    ctx.body = { succeed: false, info: 'Username or password is error.'};
+                }
             } else {
                 ctx.body = { succeed: false, info: 'Username or password is null.' };
             }
@@ -46,11 +51,6 @@ export class UserContorl {
                     password: md5(requestBody.password + 'wOkkLtKMaXA9MIZq')
                 }]);
                 ctx.body = { succeed: true, info: 'Register successfully.', obj: result };
-                // result.then((data) => {
-                //     ctx.body = { succeed: true, info: 'Register successfully.', obj: data };
-                // }).catch((err) => {
-                //     ctx.body = { succeed: false, info: 'Please try again after changing the username.', obj: err };
-                // });
             } else {
                 ctx.body = { succeed: false, info: 'Password attirm error.' };
             }
