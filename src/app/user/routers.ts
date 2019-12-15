@@ -1,12 +1,12 @@
 import Router from 'koa-router';
-import { UserContorl } from './controllers';
+import { UserControl } from './controllers';
 
 export class UserRouter {
 
     router = new Router();
 
     constructor(){ 
-        let contorl = new UserContorl();
+        let contorl = new UserControl();
         this.router
         .post('/login', contorl.login)
         .post('/register', contorl.register)

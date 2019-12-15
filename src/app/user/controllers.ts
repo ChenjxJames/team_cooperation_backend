@@ -1,4 +1,3 @@
-import { DB } from 'none-sql';
 import md5 from 'md5';
 
 interface Result {
@@ -7,26 +6,13 @@ interface Result {
     obj?: any
 }
 
-export class UserContorl {
-    db: DB;
-    constructor() {
-        this.db = new DB('team_cooperation', 'root', '', 'localhost');
-    }
-
-    getUserByName(username: string) {
-        let result = this.db.connect('users').where({username: username}).get();
-        result.then((data: any) => {
-            return data[0];
-        }).catch((err) => {
-            throw err;
-        });
-    }
+export class UserControl {
 
     login = async (ctx: any) => {
         try {
             let requestBody = ctx.request.body;
             if (requestBody.username && requestBody.password) {
-                let user = (await this.db.connect('users').where({username: requestBody.username}).get()).info[0];
+                let user = (await ctx.request.db.connect('users').where({username: requestBody.username}).get()).info[0];
                 if (user.password === md5(requestBody.password + 'wOkkLtKMaXA9MIZq')) {
                     ctx.session.username = user.username;
                     ctx.body = { succeed: true, info: 'Login successfully.'};
@@ -46,7 +32,7 @@ export class UserContorl {
         try {
             let requestBody = ctx.request.body
             if (requestBody.password === requestBody.passwordAttirm) {
-                const result = await this.db.connect('users').add([{
+                const result = await ctx.request.db.connect('users').add([{
                     username: requestBody.username,
                     password: md5(requestBody.password + 'wOkkLtKMaXA9MIZq')
                 }]);

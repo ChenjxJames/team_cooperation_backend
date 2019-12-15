@@ -1,6 +1,6 @@
 const Router = require('koa-router')
 
-import { MainContorl } from './controllers';
+import { MainControl } from './controllers';
 import { UserRouter } from './user/routers';
 
 export class MainRouter {
@@ -8,7 +8,7 @@ export class MainRouter {
     
     constructor() {
         let home = new Router();
-        let mainContorl = new MainContorl();
+        let mainContorl = new MainControl();
         let userRouter = new UserRouter();
         home.get('/', mainContorl.main);
         this.router.use('/', home.routes(), home.allowedMethods());

@@ -1,4 +1,4 @@
-export class MainContorl {
+export class MainControl {
     main = async (ctx: any) => {
         if (ctx.session.username) {
              let html = `
