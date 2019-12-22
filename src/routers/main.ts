@@ -1,7 +1,7 @@
 const Router = require('koa-router')
 
-import { MainControl } from './controllers';
-import { UserRouter } from './user/routers';
+import { MainControl } from '../controllers';
+import { UserRouter } from './user';
 
 export class MainRouter {
     router = new Router();

@@ -4,8 +4,8 @@ import session from 'koa-session';
 import mongoose from 'mongoose';
 import { Pool } from 'none-sql';
 
-import { MongooseStore } from './baseService/sessionStore'
-import { MainRouter } from './app/main';
+import { MongooseStore } from './public/sessionStore'
+import { MainRouter } from './routers/main';
 
 const app = new Koa();
 const mainRouter = new MainRouter(); 
