@@ -3,15 +3,21 @@ import { UserControl } from '../controllers/user';
 
 export class UserRouter {
 
-    router = new Router();
+  router: Router;
+  userControl: UserControl;
 
-    constructor(){ 
-        let contorl = new UserControl();
-        this.router
-        .post('/login', contorl.login)
-        .post('/register', contorl.register)
-        .get('/logout', contorl.logout);
-    }
-    
-
+  constructor(){ 
+    this.router = new Router();
+    this.userControl = new UserControl();
+    this.router
+    .post('/login', this.userControl.login)
+    .post('/register', this.userControl.register)
+    .post('/changePassword', this.userControl.changePassword)
+    .post('/forgetPassword', this.userControl.forgetPassword)
+    .post('/resetPassword', this.userControl.resetPassword)
+    .post('/getUserInfoById', this.userControl.getUserInfoById)
+    .post('/getUsernameById', this.userControl.getUsernameById)
+    .get('/logout', this.userControl.logout);
+  }
+  
 }

@@ -1,0 +1,1 @@
+export const SALT = 'wOkkLtKMaXA9MIZq';

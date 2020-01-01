@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
 
-import { MongooseStore } from '../common/sessionStore'
+import { MongooseStore } from '../lib/sessionStore'
 
-mongoose.connect("mongodb://localhost/team_cooperation", { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
+export const MONGODB_URIS = 'mongodb://localhost/team_cooperation';
+export const MONGODB_OPTIONS = { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }
+
+mongoose.connect(MONGODB_URIS, MONGODB_OPTIONS);
 
 export const SESSION_CONFIG = {
   key: 'koa:sess',
@@ -12,9 +15,9 @@ export const SESSION_CONFIG = {
   signed: true,
   rolling: true,
   store: new MongooseStore({
-    collection: 'sessions',
+    collection: 'session',
     connection: mongoose,
-    expires: 86400, // 1 day is the default
+    expires: 604800, // 7 day(1 day is the default)
     name: 'session'
   })
 }

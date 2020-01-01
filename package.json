@@ -16,6 +16,7 @@
     "koa-session": "^5.12.3",
     "md5": "^2.2.1",
     "mongoose": "^5.7.12",
+    "nodemailer": "^6.4.2",
     "none-sql": "^1.2.2"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "@types/koa-session": "^5.10.1",
     "@types/md5": "^2.1.33",
     "@types/mongoose": "^5.5.32",
-    "@types/node": "^12.12.5"
+    "@types/node": "^12.12.5",
+    "@types/nodemailer": "^6.4.0"
   }
 }
