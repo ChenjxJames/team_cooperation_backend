@@ -15,7 +15,7 @@ export class UserRouter {
     .post('/changePassword', this.userControl.changePassword)
     .post('/forgetPassword', this.userControl.forgetPassword)
     .post('/resetPassword', this.userControl.resetPassword)
-    .post('/getUserInfoById', this.userControl.getUserInfoById)
+    .post('/getUserInfoByCookie', this.userControl.getUserInfoByCookie)
     .post('/getUsernameById', this.userControl.getUsernameById)
     .get('/logout', this.userControl.logout);
   }

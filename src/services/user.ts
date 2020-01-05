@@ -2,7 +2,7 @@ import md5 from 'md5';
 
 import { UserImpl } from "../models/user";
 import { VerificationCodeImpl } from '../models/verificationCode';
-import { Mail } from '../lib/mail';
+import Mail from '../lib/mail';
 import { HOSTNAME } from '../config/index';
 import { SALT } from '../config/security';
 
@@ -25,7 +25,10 @@ export class UserService {
         }
         resolve(result);
       } catch (err) {
-        reject(err);
+        let result = {
+          succeeded: false,
+        }
+        resolve(result);
       }
     });      
   }
@@ -41,7 +44,7 @@ export class UserService {
         await this.userImpl.createUser();
         resolve(true);
       } catch (err) {
-        reject(err);
+        resolve(false);
       }
     });
   }
@@ -56,7 +59,7 @@ export class UserService {
         await this.userImpl.save();
         resolve(true);
       } catch (err) {
-        reject(err);
+        resolve(false);
       }
     });
   }
@@ -76,7 +79,7 @@ export class UserService {
         }
         resolve(true);
       } catch (err) {
-        reject(err);
+        resolve(false);
       }
     });
   }
@@ -97,7 +100,7 @@ export class UserService {
 
         resolve(true);
       } catch (err) {
-        reject(err);
+        resolve(false);
       }
     });
   }

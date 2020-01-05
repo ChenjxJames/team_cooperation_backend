@@ -15,19 +15,14 @@ export class UserControl {
     this.userService = new UserService();
   }
 
-  getUserInfoById = async (ctx: any) => {
+  getUserInfoByCookie = async (ctx: any) => {
     try {
-      let requestBody = ctx.request.body
-      if (requestBody.user_id) {
-        const data = {
-          user_id: ctx.session.user_id,
-          username: ctx.session.username,
-          email: ctx.session.email
-        };
-        ctx.body = { succeeded: true, info: 'Get successfully.', data: data};
-      } else {
-        ctx.body = { succeeded: false, info: 'Id is null.' };
-      }
+      const data = {
+        user_id: ctx.session.user_id,
+        username: ctx.session.username,
+        email: ctx.session.email
+      };
+      ctx.body = { succeeded: true, info: 'Get successfully.', data: data};
     } catch (err) {
       console.error(err);
       ctx.body = { succeeded: false, info: 'Server error.', error: err };
@@ -69,7 +64,7 @@ export class UserControl {
         if(await this.userService.register(requestBody.username, requestBody.password, requestBody.email)) {
           ctx.body = { succeeded: true, info: 'Register successfully.' };
         } else {
-          ctx.body = { succeeded: false, info: 'Server inner error.' };
+          ctx.body = { succeeded: false, info: 'Register failed. Please change your username and try again.' };
         }        
       } else {
         ctx.body = { succeeded: false, info: 'Password attirm error.' };
@@ -92,7 +87,7 @@ export class UserControl {
         if(await this.userService.changePassword(ctx.session.username, requestBody.password)) {
           ctx.body = { succeeded: true, info: 'Change password successfully.' };
         } else {
-          ctx.body = { succeeded: false, info: 'Change password faild.' };
+          ctx.body = { succeeded: false, info: 'Change password failed.' };
         }
       } else {
         ctx.body = { succeeded: false, info: 'Password attirm error.' };
@@ -142,7 +137,7 @@ export class UserControl {
         if(await this.userService.resetPassword(requestBody.user_id, requestBody.username, requestBody.password, requestBody.verification_code)) {
           ctx.body = { succeeded: true, info: 'Reset password successfully.' };
         } else {
-          ctx.body = { succeeded: false, info: 'Reset password faild. Link invalid.' };
+          ctx.body = { succeeded: false, info: 'Reset password failed. Link invalid.' };
         }
       } else {
         ctx.body = { succeeded: false, info: 'Password attirm error.' };
