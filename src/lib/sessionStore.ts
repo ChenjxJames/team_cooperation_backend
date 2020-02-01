@@ -25,7 +25,7 @@ export class MongooseStore {
   }
 
   async destroy(id: string) {
-    return this.session.remove({ _id: id });
+    return this.session.deleteOne({ _id: id });
   }
 
   async get(id: string) {

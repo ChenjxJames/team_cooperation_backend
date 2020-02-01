@@ -1,10 +1,17 @@
 import { Connection } from 'none-sql';
+import { MySqlPool } from '../lib/MySql';
 
 interface Organization {
   _organization_id: number;
   organization_name: string;
   email: string;
   create_time: string;
+}
+
+interface OrganizationUser {
+  organization_id: number;
+  user_id: number;
+  role_id: number;
 }
 
 export class OrganizationImpl implements Organization {
@@ -17,14 +24,42 @@ export class OrganizationImpl implements Organization {
   email: string = '';
   create_time: string = '';
 
-  connection: Connection;
-
-  constructor(connection: Connection) {
-    this.connection = connection;
+  organizationUser: OrganizationUser = {
+    organization_id: 0,
+    user_id: 0,
+    role_id: 3,
   }
 
-  setValues() {
+  connection!: Connection;
 
+  constructor() {
+    
+  }
+
+  async init() {
+    try {
+      if(!this.connection) {
+        this.connection = await MySqlPool.getConnection();
+      }    
+    } catch (err) {
+      throw err;
+    }   
+  }
+
+  initValues() {
+    this._organization_id = 0;
+    this.organization_name = '';
+    this.email = '';
+    this.create_time = '';
+  }
+
+  setValues(
+    {organization_name, email, create_time}: 
+    {organization_name: string, email: string, create_time: string}
+    ) {
+    this.organization_name = organization_name;
+    this.email = email;
+    create_time = create_time;
   }
 
   save() {
@@ -35,16 +70,58 @@ export class OrganizationImpl implements Organization {
 
   }
 
-  createOrganization() {
-
+  async createOrganization(userId: number, name: string, email: string) {
+    try {
+      let sql = 'INSERT INTO `organization` (`organization_name`, `email`) VALUES (?, ?)';
+      let result: any = await this.connection.query(sql, [name, email]);
+      this.organizationUser.organization_id = result.info.insertId;
+      this.organizationUser.user_id = userId;
+      this.organizationUser.role_id = 1;
+      await this.addUser(this.organizationUser.organization_id, this.organizationUser.user_id, this.organizationUser.role_id);
+      return { succeeded: true, info: 'Organization create successfully.' };
+    } catch (err) {
+      throw err;
+    }
   }
 
-  addUser() {
+  removeOrganization() {
 
   }
+  
+  async getOrganizationByUserId(userId: number) { 
+    try {
+      this.initValues();
+      let sql = 'SELECT * FROM `organization_user` WHERE `user_id`=?';
+      let result: any = await this.connection.query(sql, [userId]);
+      const organizationUser = result.info[0];
+      if(organizationUser) {
+        this.organizationUser = organizationUser;
+        this._organization_id = organizationUser.organization_id | 0;
+        sql = 'SELECT * FROM `organization` WHERE `organization_id`=?';
+        result = await this.connection.query(sql, [organizationUser.organization_id]);
+        this.setValues(result.info[0])
+      }
+    } catch (err) {
+      throw err;
+    }    
+  }
 
-  removeUser() {
+  async addUser(organizationId: number, userId: number, roleId: number) {
+    try {
+      let sql = 'INSERT INTO `organization_user`(`organization_id`, `user_id`, `role_id`) VALUES(?, ?, ?)';
+      return await this.connection.query(sql, [organizationId, userId, roleId]);
+    } catch (err) {
+      throw err;
+    }
+  }
 
+  async removeUser(userId: number) {
+    try {
+      let sql = 'DELETE FROM `organization_user` WHERE `user_id` = ?';
+      return await this.connection.query(sql, [userId]);
+    } catch (err) {
+      throw err;
+    }
   }
 
   setRole() {

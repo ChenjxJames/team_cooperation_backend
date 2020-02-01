@@ -10,6 +10,8 @@ export class OrganizationRouter {
     this.router
     .post('/create', contorl.create)
     .post('/update', contorl.update)
+    .post('/join', contorl.join)
+    .post('/exit', contorl.exit)
     .get('/delete', contorl.delete);
   }
 }

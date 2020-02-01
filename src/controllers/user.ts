@@ -1,4 +1,3 @@
-import md5 from 'md5';
 import { UserService } from '../services/user';
 
 interface Result {
@@ -76,8 +75,8 @@ export class UserControl {
   }
 
   logout = async(ctx: any) => {
-    ctx.session.username = null;
-    ctx.body = 'logout page!';
+    ctx.session = null;
+    ctx.body = { succeeded: false, info: 'Logout successfully.' };
   }
 
   changePassword = async (ctx: any) => {
