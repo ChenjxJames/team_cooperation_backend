@@ -14,6 +14,7 @@ export class OrganizationRouter {
     .post('/join', contorl.join)
     .post('/exit', contorl.exit)
     .post('/setRole', contorl.setRole)
+    .post('/removeMember', contorl.removeMember)
     .get('/', contorl.information);
   }
 }

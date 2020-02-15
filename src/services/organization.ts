@@ -23,9 +23,11 @@ export class OrganizationService {
           role: rolePermission.roleName,
           permissions: rolePermission.permissions
         }
-        return { succeeded: true, info: 'Get organization information successful.', data: result };
+        return result
       } else {
-        return { succeeded: false, info: 'This user is not belong to any organization.' };
+        return  {
+          permissions: ['join_organization']
+        };
       }  
     } catch (err) {
       throw err;
@@ -48,10 +50,7 @@ export class OrganizationService {
     try {
       await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
-      if (this.organization.organization_id) {
-        return { succeeded: false, info: 'A user can only belong to one organization.' };
-      }
-      return await this.organization.createOrganization(userId, name, email);
+      await this.organization.createOrganization(userId, name, email);
     } catch (err) {
       throw err;
     }
@@ -61,11 +60,7 @@ export class OrganizationService {
     try {
       await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
-      if (this.organization.organization_id) {
-        return await this.organization.removeOrganization();
-      } else {
-        return { succeeded: false, info: 'This user is not belong to any organization.' };
-      }      
+      await this.organization.removeOrganization();
     } catch (err) {
       throw err;
     }
@@ -75,11 +70,7 @@ export class OrganizationService {
     try {
       await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
-      if (this.organization.organization_id) {
-        return { succeeded: false, info: 'A user can only belong to one organization.' };
-      }
       await this.organization.addUser(orgId, userId, 3);
-      return { succeeded: true, info: 'Join organization successful.' };
     } catch (err) {
       throw err;
     }
@@ -89,24 +80,23 @@ export class OrganizationService {
     try {
       await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
-      if (this.organization.organization_id) {
-        if (this.organization.organizationUser.role_id = 1) {
-          return { succeeded: false, info: 'Super admin cannot exit organization. Please try resetting the super admin.' };
-        }
-        await this.organization.removeUser(userId);
-        return { succeeded: true, info: 'Exit organization successful.' };
-      } else {
-        return { succeeded: false, info: 'This user is not belong to any organization.' };
-      }
-      
+      await this.organization.removeUser(userId, this.organization.organization_id);
     } catch (err) {
       throw err;
     }
   }
 
-  async setRole(userId: number, roleId: number) {
+  async setRole(organizationId: number, userId: number, roleId: number) {
     try { 
-      this.organization.setRole(userId, roleId);
+      this.organization.setRole(organizationId, userId, roleId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeMember(userId: number) {
+    try { 
+      this.organization.removeUser(userId, this.organization.organization_id);
     } catch (err) {
       throw err;
     }

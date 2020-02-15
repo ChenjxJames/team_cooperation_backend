@@ -79,7 +79,6 @@ export class OrganizationImpl implements Organization {
       this.organizationUser.user_id = userId;
       this.organizationUser.role_id = 1;
       await this.addUser(this.organizationUser.organization_id, this.organizationUser.user_id, this.organizationUser.role_id);
-      return { succeeded: true, info: 'Organization create successfully.' };
     } catch (err) {
       throw err;
     }
@@ -87,11 +86,12 @@ export class OrganizationImpl implements Organization {
 
   async removeOrganization() {
     try {
-      let sql = 'DELETE FROM `organization` WHERE `organization_id`=?';
-      await this.connection.query(sql, [this._organization_id]);
-      sql = 'DELETE FROM `organization_user` WHERE `organization_id`=?';
-      await this.connection.query(sql, [this._organization_id]);
-      return { succeeded: true, info: 'Organization delete successfully.' };
+      this.connection.transaction(async () => {  
+        let sql = 'DELETE FROM `organization_user` WHERE `organization_id`=?';
+        await this.connection.query(sql, [this.organization_id]);
+        sql = 'DELETE FROM `organization` WHERE `organization_id`=?';
+        await this.connection.query(sql, [this.organization_id]);
+      });
     } catch (err) {
       throw err;
     }
@@ -118,25 +118,25 @@ export class OrganizationImpl implements Organization {
   async addUser(organizationId: number, userId: number, roleId: number) {
     try {
       let sql = 'INSERT INTO `organization_user`(`organization_id`, `user_id`, `role_id`) VALUES(?, ?, ?)';
-      return await this.connection.query(sql, [organizationId, userId, roleId]);
+      await this.connection.query(sql, [organizationId, userId, roleId]);
     } catch (err) {
       throw err;
     }
   }
 
-  async removeUser(userId: number) {
+  async removeUser(userId: number, organizationId: number) {
     try {
-      let sql = 'DELETE FROM `organization_user` WHERE `user_id` = ?';
-      return await this.connection.query(sql, [userId]);
+      let sql = 'DELETE FROM `organization_user` WHERE `user_id`=? and organization_id=?;';
+      await this.connection.query(sql, [userId, organizationId]);
     } catch (err) {
       throw err;
     }
   }
 
-  async setRole(userId: number, roleId: number) {
+  async setRole(organizationId: number, userId: number, roleId: number) {
     try { 
-      const sql = 'UPDATE `organization_user` SET `role_id`=? WHERE `user_id`=?;';
-      return await this.connection.query(sql, [roleId, userId]);
+      const sql = 'UPDATE `organization_user` SET `role_id`=? WHERE `user_id`=? and organization_id=?;';
+      return await this.connection.query(sql, [roleId, userId, organizationId]);
     } catch (err) {
       throw err;
     }
