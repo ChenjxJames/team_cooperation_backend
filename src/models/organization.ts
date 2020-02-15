@@ -62,12 +62,13 @@ export class OrganizationImpl implements Organization {
     create_time = create_time;
   }
 
-  save() {
-
-  }
-
-  updateOrganization() {
-
+  async save() {
+    try { 
+      const sql = 'UPDATE `organization` SET `organization_name`=?,`email`=? WHERE `organization_id`=?;';
+      return await this.connection.query(sql, [this.organization_name, this.email, this._organization_id]);
+    } catch (err) {
+      throw err;
+    }
   }
 
   async createOrganization(userId: number, name: string, email: string) {
@@ -84,8 +85,16 @@ export class OrganizationImpl implements Organization {
     }
   }
 
-  removeOrganization() {
-
+  async removeOrganization() {
+    try {
+      let sql = 'DELETE FROM `organization` WHERE `organization_id`=?';
+      await this.connection.query(sql, [this._organization_id]);
+      sql = 'DELETE FROM `organization_user` WHERE `organization_id`=?';
+      await this.connection.query(sql, [this._organization_id]);
+      return { succeeded: true, info: 'Organization delete successfully.' };
+    } catch (err) {
+      throw err;
+    }
   }
   
   async getOrganizationByUserId(userId: number) { 
@@ -124,8 +133,13 @@ export class OrganizationImpl implements Organization {
     }
   }
 
-  setRole() {
-
+  async setRole(userId: number, roleId: number) {
+    try { 
+      const sql = 'UPDATE `organization_user` SET `role_id`=? WHERE `user_id`=?;';
+      return await this.connection.query(sql, [roleId, userId]);
+    } catch (err) {
+      throw err;
+    }
   }
 
 }

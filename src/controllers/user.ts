@@ -37,6 +37,7 @@ export class UserControl {
           ctx.session.user_id = result.user_id;
           ctx.session.username = requestBody.username;
           ctx.session.email = result.email;
+          console.log(ctx.session.per);
           const data = {
             user_id: ctx.session.user_id,
             username: ctx.session.username,
