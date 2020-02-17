@@ -23,17 +23,11 @@ export class UserImpl implements User {
   connection!: Connection;
 
   constructor() {
-    
-  }
-
-  async init() {
-    try {
-      if(!this.connection) {
-        this.connection = await MySqlPool.getConnection();
-      }    
-    } catch (err) {
-      throw err;
-    }   
+    MySqlPool.getConnection().then((result: any) => {
+      this.connection = result;
+    }).catch((error: any) => {
+      console.log(error)
+    })
   }
 
   setValues(username: string, password: string, email: string, phone: number, create_time: string) {

@@ -11,17 +11,11 @@ export class Permission{
   connection!: Connection;
 
   constructor() {
-    
-  }
-
-  async init() {
-    try {
-      if(!this.connection) {
-        this.connection = await MySqlPool.getConnection();
-      }    
-    } catch (err) {
-      throw err;
-    }   
+    MySqlPool.getConnection().then((result: any) => {
+      this.connection = result;
+    }).catch((error: any) => {
+      console.log(error)
+    })
   }
   
   async getPermissions(roleId: number): Promise<RolePermission> {

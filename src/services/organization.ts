@@ -3,19 +3,18 @@ import { Permission } from "../models/permission";
 
 export class OrganizationService {
   organization: OrganizationImpl;
+  permission : Permission;
 
   constructor() {
     this.organization = new OrganizationImpl();
+    this.permission = new Permission();
   }
 
   async getInformation(userId: number) {
-    try { 
-      await this.organization.init();
+    try {      
       await this.organization.getOrganizationByUserId(userId);
       if (this.organization.organization_id) {
-        let permission = new Permission();
-        await permission.init();
-        const rolePermission = await permission.getPermissions(this.organization.organizationUser.role_id);
+        const rolePermission = await this.permission.getPermissions(this.organization.organizationUser.role_id);
         let result = {
           id: this.organization.organization_id,
           name: this.organization.organization_name,
@@ -36,7 +35,6 @@ export class OrganizationService {
 
   async updateOrganization(userId: number, organizationName: string, organizationEmail: string) {
     try {
-      await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
       this.organization.organization_name = organizationName;
       this.organization.email = organizationEmail;
@@ -48,7 +46,6 @@ export class OrganizationService {
 
   async createOrganization(userId: number, name: string, email: string) {
     try {
-      await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
       await this.organization.createOrganization(userId, name, email);
     } catch (err) {
@@ -58,7 +55,6 @@ export class OrganizationService {
 
   async removeOrganization(userId: number) {
     try {
-      await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
       await this.organization.removeOrganization();
     } catch (err) {
@@ -68,7 +64,6 @@ export class OrganizationService {
 
   async joinOrganization(userId: number, orgId: number) {
     try {
-      await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
       await this.organization.addUser(orgId, userId, 3);
     } catch (err) {
@@ -78,7 +73,6 @@ export class OrganizationService {
 
   async exitOrganization(userId: number) {
     try {
-      await this.organization.init();
       await this.organization.getOrganizationByUserId(userId);
       await this.organization.removeUser(userId, this.organization.organization_id);
     } catch (err) {
@@ -96,6 +90,7 @@ export class OrganizationService {
 
   async removeMember(userId: number) {
     try { 
+      await this.organization.getOrganizationByUserId(userId);
       this.organization.removeUser(userId, this.organization.organization_id);
     } catch (err) {
       throw err;

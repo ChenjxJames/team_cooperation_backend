@@ -3,7 +3,7 @@ import { Pool, Connection } from 'none-sql';
 export class MySqlPool {
   static pool: Pool;
 
-  constructor(config: {dbname: string, username: string, password: string, host: string, connectionLimit: number}) {
+  static init(config: {dbname: string, username: string, password: string, host: string, connectionLimit: number}) {
     MySqlPool.pool = new Pool(
       config.dbname, 
       config.username, 
@@ -14,10 +14,10 @@ export class MySqlPool {
   }
 
   static async getConnection(): Promise<Connection> {
-    return await MySqlPool.pool.getConnection();
+    return MySqlPool.pool.getConnection();
   }
   
-  async release(connection: any) {
-    connection.release();
+  static async release(connection: Connection) {
+    connection.connection.release();
   }
 }

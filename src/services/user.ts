@@ -16,7 +16,6 @@ export class UserService {
   async login(username: string, password: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.userImpl.init();
         await this.userImpl.getUserByUsername(username);
         let result = {
           succeeded: this.userImpl.password === this.encrypt(password),
@@ -37,7 +36,6 @@ export class UserService {
     return new Promise(async (resolve, reject) => {
       try {
         let user = new UserImpl();
-        await this.userImpl.init();
         this.userImpl.username = username;
         this.userImpl.password = this.encrypt(password);
         this.userImpl.email = email;
@@ -52,7 +50,6 @@ export class UserService {
   async changePassword(username: string, newPassword: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.userImpl.init();
         await this.userImpl.getUserByUsername(username);
         this.userImpl.password = this.encrypt(newPassword);
         this.userImpl.save();
@@ -70,7 +67,6 @@ export class UserService {
         let verificationCode =  new VerificationCodeImpl();
         let result = await verificationCode.getByCode(userId, verification_code);
         if(result.user_id) {
-          await this.userImpl.init();
           await this.userImpl.getUserByUserId(userId);
           if(this.userImpl.username === username) {
             await this.changePassword(username, password);
@@ -87,7 +83,6 @@ export class UserService {
   async forgetPassword(email: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.userImpl.init();
         await this.userImpl.getUserByEmail(email);
 
         let verificationCode = new VerificationCodeImpl();
@@ -108,7 +103,6 @@ export class UserService {
   async getUsernameById(user_id: number) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.userImpl.init();
         await this.userImpl.getUserByUserId(user_id);
         resolve(this.userImpl.username);
       } catch (err) {
