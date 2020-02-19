@@ -58,7 +58,7 @@ export class OrganizationImpl implements Organization {
 
   async save() {
     try { 
-      const sql = 'UPDATE `organization` SET `organization_name`=?,`email`=? WHERE `organization_id`=?;';
+      const sql = 'UPDATE `organization` SET `organization_name`=?,`email`=? WHERE `organization_id`=?';
       return await this.connection.query(sql, [this.organization_name, this.email, this._organization_id]);
     } catch (err) {
       throw err;
@@ -120,7 +120,7 @@ export class OrganizationImpl implements Organization {
 
   async removeUser(userId: number, organizationId: number) {
     try {
-      let sql = 'DELETE FROM `organization_user` WHERE `user_id`=? and organization_id=?;';
+      let sql = 'DELETE FROM `organization_user` WHERE `user_id`=? and organization_id=?';
       await this.connection.query(sql, [userId, organizationId]);
     } catch (err) {
       throw err;
@@ -129,8 +129,17 @@ export class OrganizationImpl implements Organization {
 
   async setRole(organizationId: number, userId: number, roleId: number) {
     try { 
-      const sql = 'UPDATE `organization_user` SET `role_id`=? WHERE `user_id`=? and organization_id=?;';
+      const sql = 'UPDATE `organization_user` SET `role_id`=? WHERE `user_id`=? and organization_id=?';
       return await this.connection.query(sql, [roleId, userId, organizationId]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getOrganizationMembers() {
+    try {
+      const sql = 'SELECT `user`.`user_id`,`username`,`email` FROM `organization_user` LEFT JOIN `user` ON `organization_user`.`user_id`=`user`.`user_id` WHERE `organization_id`=?';
+      return (await this.connection.query(sql, [this.organization_id])).info;
     } catch (err) {
       throw err;
     }

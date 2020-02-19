@@ -13,7 +13,7 @@ export class OrganizationControl {
       const userId = ctx.session.user_id;
       const result = await this.organizationService.getInformation(userId);
       ctx.session.organization = result;
-      ctx.body = { succeeded: true, info: 'Get organization information successful.', data: result };;
+      ctx.body = { succeeded: true, info: 'Get organization information successful.', data: result };
     } catch (err) {
       console.error(err);
       ctx.body = { succeeded: false, info: 'Server error.', error: err };

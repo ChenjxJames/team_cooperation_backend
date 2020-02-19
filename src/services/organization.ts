@@ -15,12 +15,14 @@ export class OrganizationService {
       await this.organization.getOrganizationByUserId(userId);
       if (this.organization.organization_id) {
         const rolePermission = await this.permission.getPermissions(this.organization.organizationUser.role_id);
+        const members = await this.organization.getOrganizationMembers();
         let result = {
           id: this.organization.organization_id,
           name: this.organization.organization_name,
           email: this.organization.email,
           role: rolePermission.roleName,
-          permissions: rolePermission.permissions
+          permissions: rolePermission.permissions,
+          member: members,
         }
         return result
       } else {
