@@ -13,10 +13,18 @@ export class OrganizationService {
   async getInformation(userId: number) {
     try {      
       await this.organization.getOrganizationByUserId(userId);
+      let result = {
+        id: 0, 
+        name: '', 
+        email: '', 
+        role: '',
+        permissions: ['join_organization'], 
+        member: []
+      }
       if (this.organization.organization_id) {
         const rolePermission = await this.permission.getPermissions(this.organization.organizationUser.role_id);
         const members = await this.organization.getOrganizationMembers();
-        let result = {
+        result = {
           id: this.organization.organization_id,
           name: this.organization.organization_name,
           email: this.organization.email,
@@ -24,12 +32,8 @@ export class OrganizationService {
           permissions: rolePermission.permissions,
           member: members,
         }
-        return result
-      } else {
-        return  {
-          permissions: ['join_organization']
-        };
-      }  
+      }
+      return result;
     } catch (err) {
       throw err;
     }

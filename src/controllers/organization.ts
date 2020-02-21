@@ -12,7 +12,14 @@ export class OrganizationControl {
     try {
       const userId = ctx.session.user_id;
       const result = await this.organizationService.getInformation(userId);
-      ctx.session.organization = result;
+      ctx.session.organization = {};
+      ctx.session.organization.permissions = result.permissions;
+      if(result.id) {
+        ctx.session.organization.id = result.id;
+        ctx.session.organization.name = result.name;
+        ctx.session.organization.email = result.email;
+        ctx.session.organization.role = result.role;
+      }
       ctx.body = { succeeded: true, info: 'Get organization information successful.', data: result };
     } catch (err) {
       console.error(err);
