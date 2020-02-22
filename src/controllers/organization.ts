@@ -1,4 +1,3 @@
-import { OrganizationImpl } from '../models/organization';
 import { OrganizationService } from '../services/organization';
 
 export class OrganizationControl {
