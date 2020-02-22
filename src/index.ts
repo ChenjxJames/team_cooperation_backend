@@ -23,5 +23,5 @@ app.use(loginFilter);  // 加载登录验证拦截器中间件
 app.use(mainRouter.router.routes()).use(mainRouter.router.allowedMethods());  // 加载路由中间件
 
 app.listen(RUN_CONFIG.port, () => {
-  console.log(`route-use-middleware is starting at port ${RUN_CONFIG.port}`);
+  console.info(`route-use-middleware is starting at port ${RUN_CONFIG.port}`);
 });

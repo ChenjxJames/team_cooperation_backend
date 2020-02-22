@@ -14,7 +14,7 @@ export class Permission{
     MySqlPool.getConnection().then((result: any) => {
       this.connection = result;
     }).catch((error: any) => {
-      console.log(error)
+      console.error(error)
     })
   }
   

@@ -36,7 +36,7 @@ export class OrganizationImpl implements Organization {
     MySqlPool.getConnection().then((result: any) => {
       this.connection = result;
     }).catch((error: any) => {
-      console.log(error)
+      console.error(error)
     })
   }
 
@@ -138,7 +138,7 @@ export class OrganizationImpl implements Organization {
 
   async getOrganizationMembers() {
     try {
-      const sql = 'SELECT `user`.`user_id`,`username`,`email` FROM `organization_user` LEFT JOIN `user` ON `organization_user`.`user_id`=`user`.`user_id` WHERE `organization_id`=?';
+      const sql = 'SELECT `user`.`user_id`,`username`,`email`,`role_id` FROM `organization_user` LEFT JOIN `user` ON `organization_user`.`user_id`=`user`.`user_id` WHERE `organization_id`=?';
       return (await this.connection.query(sql, [this.organization_id])).info;
     } catch (err) {
       throw err;
