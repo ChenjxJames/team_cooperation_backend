@@ -67,12 +67,12 @@ export class OrganizationImpl implements Organization {
 
   async createOrganization(userId: number, name: string, email: string) {
     try {
-      let sql = 'INSERT INTO `organization` (`organization_name`, `email`) VALUES (?, ?)';
-      let result: any = await this.connection.query(sql, [name, email]);
-      this.organizationUser.organization_id = result.info.insertId;
-      this.organizationUser.user_id = userId;
-      this.organizationUser.role_id = 1;
-      await this.addUser(this.organizationUser.organization_id, this.organizationUser.user_id, this.organizationUser.role_id);
+      await this.connection.transaction(async () => {
+        let sql = 'INSERT INTO `organization` (`organization_name`, `email`) VALUES (?, ?)';
+        const result: any = await this.connection.query(sql, [name, email]);
+        sql = 'INSERT INTO `organization_user`(`organization_id`, `user_id`, `role_id`) VALUES(?, ?, ?)';
+        await this.connection.query(sql, [result.info.insertId, userId, 1]);
+      });      
     } catch (err) {
       throw err;
     }
@@ -109,10 +109,10 @@ export class OrganizationImpl implements Organization {
     }    
   }
 
-  async addUser(organizationId: number, userId: number, roleId: number) {
+  async addUser(organizationId: number, email: string, roleId: number) {
     try {
-      let sql = 'INSERT INTO `organization_user`(`organization_id`, `user_id`, `role_id`) VALUES(?, ?, ?)';
-      await this.connection.query(sql, [organizationId, userId, roleId]);
+      const sql = 'INSERT INTO `organization_user`(`organization_id`, `user_id`, `role_id`) VALUES(? , (SELECT `user_id` FROM `user` WHERE `email`=?), ?)';
+      await this.connection.query(sql, [organizationId, email, roleId]);
     } catch (err) {
       throw err;
     }
@@ -120,7 +120,7 @@ export class OrganizationImpl implements Organization {
 
   async removeUser(userId: number, organizationId: number) {
     try {
-      let sql = 'DELETE FROM `organization_user` WHERE `user_id`=? and organization_id=?';
+      const sql = 'DELETE FROM `organization_user` WHERE `user_id`=? and organization_id=?';
       await this.connection.query(sql, [userId, organizationId]);
     } catch (err) {
       throw err;

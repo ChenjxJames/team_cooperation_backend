@@ -32,7 +32,7 @@ export class OrganizationControl {
       const userId = ctx.session.user_id;
       const permissions = ctx.session.organization.permissions;
       if (requestBody.name) {
-        if (permissions.some((permission: string)=> permission=='join_organization')) {
+        if (permissions.some((permission: string)=> permission==='join_organization')) {
           await this.organizationService.createOrganization(userId, requestBody.name, requestBody.email);
           ctx.body = { succeeded: true, info: 'Organization create successfully.' };
         } else {
@@ -52,7 +52,7 @@ export class OrganizationControl {
       const requestBody = ctx.request.body;
       if (requestBody.name) {
         const permissions = ctx.session.organization.permissions;
-        if (permissions.some((permission: string)=> permission=='set_organization_info')) {
+        if (permissions.some((permission: string)=> permission==='set_organization_info')) {
           await this.organizationService.updateOrganization(ctx.session.user_id, requestBody.name, requestBody.email);
           ctx.body = { succeeded: true, info: 'Organization information changed successfully.' };
         } else {
@@ -71,7 +71,7 @@ export class OrganizationControl {
     try {
       const userId = ctx.session.user_id;
       const permissions = ctx.session.organization.permissions;
-      if (permissions.some((permission: string)=> permission=='remove_organization')) {
+      if (permissions.some((permission: string)=> permission==='remove_organization')) {
         await this.organizationService.removeOrganization(userId);
         ctx.body = { succeeded: true, info: 'Organization delete successfully.' };;
       } else {
@@ -83,20 +83,22 @@ export class OrganizationControl {
     }
   }
 
-  join = async (ctx: any) => {
+  invite = async (ctx: any) => {
     try {
       const requestBody = ctx.request.body;
-      const userId = ctx.session.user_id;
+      const inviterName = ctx.session.username;
       const permissions = ctx.session.organization.permissions;
-      if (requestBody.organization_id) {
-        if (permissions.some((permission: string)=> permission=='join_organization')) {
-          await this.organizationService.joinOrganization(userId, requestBody.organization_id);
-          ctx.body = { succeeded: true, info: 'Join organization successful.' };;
+      const organizationId = ctx.session.organization.id;
+      const organizationName = ctx.session.organization.name;
+      if (requestBody.email) {
+        if (permissions.some((permission: string)=> permission==='manage_organization_member')) {
+          await this.organizationService.inviteMember(organizationId, organizationName, requestBody.email, inviterName);
+          ctx.body = { succeeded: true, info: 'Invite users to join the organization successfully.' };;
         } else {
           ctx.body = { succeeded: false, info: 'Permission denied.' };
         }
       } else {
-        ctx.body = { succeeded: false, info: 'Organization id is null.' };
+        ctx.body = { succeeded: false, info: 'Email is null.' };
       }
     } catch (err) {
       console.error(err);
@@ -108,7 +110,7 @@ export class OrganizationControl {
     try {
       const userId = ctx.session.user_id;
       const permissions = ctx.session.organization.permissions;
-      if (permissions.some((permission: string)=> permission=='exit_organization')) {
+      if (permissions.some((permission: string)=> permission==='exit_organization')) {
         await this.organizationService.exitOrganization(userId);
         ctx.body = { succeeded: true, info: 'Exit organization successful.' };
       } else {
@@ -125,7 +127,7 @@ export class OrganizationControl {
       const requestBody = ctx.request.body;
       if (requestBody.user_id && requestBody.role_id) {
         const permissions = ctx.session.organization.permissions;
-        if (permissions.some((permission: string)=> permission=='set_organization_admin')) {
+        if (permissions.some((permission: string)=> permission==='set_organization_admin')) {
           await this.organizationService.setRole(ctx.session.organization.id, requestBody.user_id, requestBody.role_id);
           ctx.body = { succeeded: true, info: 'Role changed successfully.' };
         } else {
@@ -145,7 +147,7 @@ export class OrganizationControl {
       const requestBody = ctx.request.body;
       if (requestBody.user_id) {
         const permissions = ctx.session.organization.permissions;
-        if (permissions.some((permission: string)=> permission=='manage_organization_member')) {
+        if (permissions.some((permission: string)=> permission==='manage_organization_member')) {
           await this.organizationService.removeMember(requestBody.user_id);
           ctx.body = { succeeded: true, info: 'Organization member remove successfully.' };
         } else {

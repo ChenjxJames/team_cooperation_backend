@@ -1,5 +1,6 @@
 import { OrganizationImpl } from "../models/organization";
 import { Permission } from "../models/permission";
+import Mail from "../lib/mail";
 
 export class OrganizationService {
   organization: OrganizationImpl;
@@ -52,7 +53,6 @@ export class OrganizationService {
 
   async createOrganization(userId: number, name: string, email: string) {
     try {
-      await this.organization.getOrganizationByUserId(userId);
       await this.organization.createOrganization(userId, name, email);
     } catch (err) {
       throw err;
@@ -68,10 +68,11 @@ export class OrganizationService {
     }
   }
 
-  async joinOrganization(userId: number, orgId: number) {
+  async inviteMember(organizationId: number, organizationName: string, email: string, inviterName: string) {
     try {
-      await this.organization.getOrganizationByUserId(userId);
-      await this.organization.addUser(orgId, userId, 3);
+      await this.organization.addUser(organizationId, email, 3);
+      const mail = new Mail();
+      await mail.sendInform(email, `已加入${organizationName}`, `您已在管理员${inviterName}的邀请下加入本组织。`);
     } catch (err) {
       throw err;
     }
@@ -97,7 +98,7 @@ export class OrganizationService {
   async removeMember(userId: number) {
     try { 
       await this.organization.getOrganizationByUserId(userId);
-      this.organization.removeUser(userId, this.organization.organization_id);
+      await this.organization.removeUser(userId, this.organization.organization_id);
     } catch (err) {
       throw err;
     }

@@ -11,7 +11,7 @@ export class OrganizationRouter {
     .post('/create', contorl.create)
     .post('/update', contorl.update)
     .post('/remove', contorl.remove)
-    .post('/join', contorl.join)
+    .post('/invite', contorl.invite)
     .post('/exit', contorl.exit)
     .post('/setRole', contorl.setRole)
     .post('/removeMember', contorl.removeMember)
