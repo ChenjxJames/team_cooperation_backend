@@ -145,4 +145,12 @@ export class OrganizationImpl implements Organization {
     }
   }
 
+  async getOrganizationByUserEmail(email: string) {
+    try {
+      const sql = 'SELECT * FROM `organization_user` LEFT JOIN `user` USING(`user_id`) WHERE `user`.`email` = ?';
+      return (await this.connection.query(sql, [email])).info[0];
+    } catch (err) {
+      throw err;
+    }
+  }
 }

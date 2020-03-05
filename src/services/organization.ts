@@ -103,4 +103,12 @@ export class OrganizationService {
       throw err;
     }
   }
+
+  async getOrganizationByUserEmail(email: string) {
+    try {
+      return await this.organization.getOrganizationByUserEmail(email);
+    } catch (err) {
+      throw err;
+    }
+  }
 }

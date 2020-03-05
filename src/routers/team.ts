@@ -10,6 +10,12 @@ export class TeamRouter {
     this.router
     .post('/create', contorl.create)
     .post('/invite', contorl.invite)
-    .get('/', contorl.information);
+    .post('/update', contorl.update)
+    .post('/remove', contorl.remove)
+    .post('/removeMember', contorl.removeMember)
+    .post('/exit', contorl.exit)
+    .post('/setRole', contorl.setRole)
+    .get('/', contorl.teams)
+    .get('/:id', contorl.team);
   }
 }
