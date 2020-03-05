@@ -87,7 +87,7 @@ export class TeamImpl implements Teams {
   async getTeamMembers(teamId: number) {
     try {
       this.members = [];
-      const sql = 'SELECT `user`.`user_id`,`role_id`,`username`,`email` FROM `team_user` LEFT JOIN `user` ON `team_user`.`user_id`=`user`.`user_id` WHERE `team_id`=?';
+      const sql = 'SELECT `user`.`user_id`,`role_id`,`username`,`email` FROM `team_user` LEFT JOIN `user` ON `team_user`.`user_id`=`user`.`user_id` WHERE `team_id`=? ORDER BY `role_id`';
       const result: any = await this.connection.query(sql, [teamId]);
       result.info.forEach((member: any) => {
         this.members.push({
