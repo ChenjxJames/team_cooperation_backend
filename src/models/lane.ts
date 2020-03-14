@@ -47,10 +47,10 @@ export default class LaneImpl implements Lane {
   async remove(laneId: number) {
     try {
       await this.connection.transaction(async () => {
-        let sql = 'DELETE FROM `lane` WHERE `lane_id` = ?';
+        let sql = 'DELETE FROM `task` WHERE `lane_id` = ?';
         await this.connection.query(sql, [laneId]);
-        sql = 'DELETE FROM `task` WHERE `lane_id` = ?';
-        await this.connection.query(sql, [laneId]);        
+        sql = 'DELETE FROM `lane` WHERE `lane_id` = ?';
+        await this.connection.query(sql, [laneId]);              
       });
     } catch (err) {
       throw err;

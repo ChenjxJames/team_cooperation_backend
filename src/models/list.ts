@@ -47,10 +47,10 @@ export default class ListImpl implements List {
   async remove(listId: number) {
     try {
       await this.connection.transaction(async () => {
-        let sql = 'DELETE FROM `list` WHERE `list_id` = ?';
-        await this.connection.query(sql, [listId]);
-        sql = 'DELETE FROM `task` WHERE `list_id` = ?';
-        await this.connection.query(sql, [listId]);        
+        let sql = 'DELETE FROM `task` WHERE `list_id` = ?';
+        await this.connection.query(sql, [listId]);   
+        sql = 'DELETE FROM `list` WHERE `list_id` = ?';
+        await this.connection.query(sql, [listId]);             
       });
     } catch (err) {
       throw err;
