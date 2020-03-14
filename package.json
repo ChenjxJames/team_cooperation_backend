@@ -17,7 +17,8 @@
     "md5": "^2.2.1",
     "mongoose": "^5.7.12",
     "nodemailer": "^6.4.2",
-    "none-sql": "^1.2.2"
+    "none-sql": "^1.2.2",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@types/koa-bodyparser": "^4.3.0",
@@ -26,6 +27,7 @@
     "@types/md5": "^2.1.33",
     "@types/mongoose": "^5.5.32",
     "@types/node": "^12.12.5",
-    "@types/nodemailer": "^6.4.0"
+    "@types/nodemailer": "^6.4.0",
+    "@types/socket.io": "^2.1.4"
   }
 }

@@ -9,7 +9,10 @@ export class BoardRouter {
     let contorl = new BoardControl();
     this.router
     .post('/create', contorl.create)
-    .post('/join', contorl.join)
-    .get('/', contorl.information);
+    .post('/remove', contorl.remove)
+    .post('/update', contorl.update)
+    .get('/team/:id', contorl.teamBoards)
+    .get('/', contorl.boards)
+    .get('/:id', contorl.board);
   }
 }

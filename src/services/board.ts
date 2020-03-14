@@ -13,35 +13,48 @@ export class BoardService {
   async getInformation(userId: number) {
     try {
       await this.board.getBoardByUserId(userId);
-      const allRolePermissions = await this.permission.getAllRolePermissions();
-      const boards = this.board.boards;
-      const result: any[] = [];
-      boards.forEach((board: any) => {
-        result.push({
-          board_id: board.board_id,
-          board_name: board.board_name,
-          create_time: board.create_time, 
-          role_id: board.role_id,
-          permissions: allRolePermissions[board.role_id].permissions
-        });
-      });
-      return result;
+      return this.board.boards;
     } catch (err) {
       throw err;
     }
   }
 
-  async createUserBoard(boardName: string, userId: number) {
+  async getInformationByTeamId(teamId: number) {
     try {
-      return await this.board.createUserBoard(boardName, userId);
+      await this.board.getBoardByTeamId(teamId);
+      return this.board.boards;
     } catch (err) {
       throw err;
     }
   }
 
-  async joinBoard(board_id: number, userId: number) {
+  async getInformationByBoardId(boardId: number) {
     try {
-      return await this.board.addUser(board_id, userId, 8);
+      return await this.board.getBoardByBoardId(boardId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async createBoard(boardName: string, teamId: number) {
+    try {
+      await this.board.create(boardName, teamId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeBoard(boardId: number) {
+    try {
+      await this.board.remove(boardId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateBoard(boardName: string, boardId: number) {
+    try {
+      await this.board.update(boardName, boardId);
     } catch (err) {
       throw err;
     }

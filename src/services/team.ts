@@ -44,9 +44,9 @@ export class TeamService {
     }
   }
 
-  async createTeam(name: string, organizationId: number, userId: number) {
+  async createTeam(teamName: string, organizationId: number, userId: number) {
     try {
-      await this.team.createTeam(name, organizationId, userId);
+      return await this.team.createTeam(teamName, organizationId, userId);
     } catch (err) {
       throw err;
     }

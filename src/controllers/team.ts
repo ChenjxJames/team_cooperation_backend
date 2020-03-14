@@ -15,19 +15,34 @@ export class TeamControl {
     teams.some((team: any) => {
       if (team.team_id == teamId) {
         permissions = team.permissions;            
+        return true;
       }
     });
     return permissions;
   }
 
+  async setSession(ctx: any) {
+    const userId = ctx.session.user_id;
+    const orgSession = await this.organizationService.getInformation(userId);
+    ctx.session.organization = {};
+    ctx.session.organization.permissions = orgSession.permissions;
+    if(orgSession.id) {
+      ctx.session.organization.id = orgSession.id;
+      ctx.session.organization.name = orgSession.name;
+      ctx.session.organization.email = orgSession.email;
+      ctx.session.organization.role = orgSession.role;
+    }
+    const result = await this.teamService.getInformation(userId);
+    ctx.session.team = {};
+    if(result.length) {
+      ctx.session.team = result;
+    }
+    return result;
+  }
+
   teams = async (ctx: any) => {
     try {
-      const userId = ctx.session.user_id;
-      const result = await this.teamService.getInformation(userId);
-      ctx.session.team = {};
-      if(result.length) {
-        ctx.session.team = result;
-      }
+      const result = await this.setSession(ctx);
       ctx.body = { succeeded: true, info: 'Get team information successfully.', data: result };
     } catch (err) {
       console.error(err);
@@ -39,11 +54,7 @@ export class TeamControl {
     try {
       const userId = ctx.session.user_id;
       const teamId = ctx.params.id;
-      const session = await this.teamService.getInformation(userId);
-      ctx.session.team = {};
-      if(session.length) {
-        ctx.session.team = session;
-      }
+      this.setSession(ctx);
       const result = await this.teamService.getInformationByTeamId(teamId, userId);
       if (result.team_id) {
         ctx.body = { succeeded: true, info: 'Get team information successfully.', data: result };
@@ -60,9 +71,9 @@ export class TeamControl {
     try {
       const requestBody = ctx.request.body;
       const userId = ctx.session.user_id;
-      if (requestBody.name) {
-        await this.teamService.createTeam(requestBody.name, ctx.session.organization.id, userId);
-        ctx.body = { succeeded: true, info: 'Team create successfully.' };
+      if (requestBody.teamName) {
+        const result = await this.teamService.createTeam(requestBody.teamName, ctx.session.organization.id, userId);
+        ctx.body = { succeeded: true, info: 'Team create successfully.', data: result };
       } else {
         ctx.body = { succeeded: false, info: 'Team name is null.' };
       }
@@ -112,10 +123,10 @@ export class TeamControl {
   update = async (ctx: any) => {
     try {
       const requestBody = ctx.request.body;
-      if (requestBody.teamId && requestBody.name) {
+      if (requestBody.teamId && requestBody.teamName) {
         const permissions = this.getTeamPermissions(ctx.session.team, requestBody.teamId);
         if (permissions.some((permission: string)=> permission==='set_team_info')) {
-          await this.teamService.updateTeamInfo(requestBody.teamId, requestBody.name);
+          await this.teamService.updateTeamInfo(requestBody.teamId, requestBody.teamName);
           ctx.body = { succeeded: true, info: 'Team information update successfully.' };
         } else {
           ctx.body = { succeeded: false, info: 'Permission denied.' };

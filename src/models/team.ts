@@ -102,14 +102,16 @@ export class TeamImpl implements Teams {
     }
   }
 
-  async createTeam(name: string, organizationId: number, userId: number) {
+  async createTeam(teamName: string, organizationId: number, userId: number) {
     try {
+      let result: any = {};
       await this.connection.transaction(async () => {
         let sql = 'INSERT INTO `team` (`team_name`, `organization_id`) VALUES (?, ?)';
-        const result: any = await this.connection.query(sql, [name, organizationId]);
+        result = await this.connection.query(sql, [teamName, organizationId]);
         sql = 'INSERT INTO `team_user`(`team_id`, `user_id`, `role_id`) VALUES(?, ?, ?)';
         await this.connection.query(sql, [result.info.insertId, userId, 4]);
       });      
+      return { teamId: result.info.insertId, teamName: teamName };
     } catch (err) {
       throw err;
     }
