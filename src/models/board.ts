@@ -72,7 +72,7 @@ export class BoardImpl implements Boards {
       const list: any = (await this.connection.query(sql, [boardId])).info;
       sql = 'SELECT `lane_id` AS `laneId`,`lane_name` AS `laneName`,`board_id` AS `boardId`,`order` FROM `lane` WHERE `board_id`=? ORDER BY `order`';
       const lane: any = (await this.connection.query(sql, [boardId])).info;
-      sql = 'SELECT * FROM `task` WHERE `list_id` IN (?) AND `lane_id` IN (?)';
+      sql = 'SELECT `task_id` AS `taskId`,`task_name` AS `taskName`,`information`,`task_dealine` AS `taskDealine`,`list_id` AS `listId`,`lane_id` AS `laneId`,`order`,`have_sub_task` AS `haveSubTask`,`have_user` AS `haveUser`,`have_file` AS `haveFile`,`have_comment` AS `haveComment`,`have_tag` AS `haveTag` FROM `task` WHERE `list_id` IN (?) AND `lane_id` IN (?) ORDER BY `order`';
       const task: any = (await this.connection.query(sql, [list.map((item: any)=>item.listId), lane.map((item: any)=>item.laneId)])).info;
       const result: any = {
         boardId: board.board_id,
