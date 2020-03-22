@@ -1,5 +1,5 @@
 import { Connection } from "none-sql";
-import { MySqlPool } from "../lib/MySql";
+import { MySqlPool } from "../lib/mysql";
 
 export interface List{
   listId?: number;

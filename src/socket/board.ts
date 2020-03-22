@@ -6,6 +6,8 @@ import { LaneService } from "../services/lane";
 import { ListService } from "../services/list";
 import { TaskService } from '../services/task';
 import { SubTaskService } from '../services/subTask';
+import { CommentService } from '../services/comment';
+import { TagService } from '../services/tag';
 
 export default class BoardSocket {
   boardService = new BoardService();
@@ -14,6 +16,8 @@ export default class BoardSocket {
   listService = new ListService();
   taskService = new TaskService();
   subTaskService = new SubTaskService();
+  commentService = new CommentService();
+  tagService = new TagService();
 
   nsp: socketIo.Namespace;
 
@@ -43,7 +47,8 @@ export default class BoardSocket {
           socket.join(data.boardId);
           const board = await this.boardService.getInformationByBoardId(data.boardId);
           const team = await this.teamService.getInformationByTeamId(board.teamId, userId);
-          result = { succeeded: true, info: 'Board information get successfully.', data: { ...board, team: team } };
+          const tags = await this.tagService.query(data.boardId);
+          result = { succeeded: true, info: 'Board information get successfully.', data: { ...board, team, tags } };
         } else {
           result = { succeeded: false, info: 'Permission denied.' };
         }
@@ -266,8 +271,20 @@ export default class BoardSocket {
       try {  
         if (data.task) {
           socket.join('task_'+data.task.taskId);
-          const subTask = await this.subTaskService.query(data.task.taskId);
-          result = { succeeded: true, info: 'Join task room successfully.', data: { subTask } };
+          let resultData: any = {};
+          if (data.task.haveSubTask) {
+            resultData.subTask = await this.subTaskService.query(data.task.taskId);
+          }
+          if (data.task.haveComment) {
+            resultData.comment = await this.commentService.query(data.task.taskId);
+          }
+          if (data.task.haveUser) {
+            resultData.member = await this.taskService.queryMember(data.task.taskId);
+          }
+          if (data.task.haveTag) {
+            resultData.taskTags = await this.taskService.queryTag(data.task.taskId);
+          }
+          result = { succeeded: true, info: 'Join task room successfully.', data: resultData };
         } else {
           result = { succeeded: false, info: 'Task information is null.' };
         }
@@ -300,13 +317,13 @@ export default class BoardSocket {
 
     socket.on('create sub task', async (data: any, fn: any) => {
       const boardId = Object.keys(socket.rooms)[0]; 
-      const taskId = Object.keys(socket.rooms)[2];
+      const taskRoom = Object.keys(socket.rooms)[2];
       console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'create sub task');
       let result: any = {};
       try {  
         if (data.subTask) {
           const subTask = await this.subTaskService.create(data.subTask);
-          this.nsp.to(taskId).emit('create sub task', { subTask });
+          this.nsp.to(taskRoom).emit('create sub task', { subTask });
           result = { succeeded: true, info: 'Create sub task successfully.' };
         } else {
           result = { succeeded: false, info: 'Sub task information is null.' };
@@ -321,13 +338,13 @@ export default class BoardSocket {
 
     socket.on('update sub task', async (data: any, fn: any) => {
       const boardId = Object.keys(socket.rooms)[0]; 
-      const taskId = Object.keys(socket.rooms)[2];
+      const taskRoom = Object.keys(socket.rooms)[2];
       console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'update sub task');
       let result: any = {};
       try {  
         if (data.subTask) {
           const subTask = this.subTaskService.update(data.subTask);
-          this.nsp.to(taskId).emit('update sub task', { subTask });
+          this.nsp.to(taskRoom).emit('update sub task', { subTask });
           result = { succeeded: true, info: 'Update sub task successfully.' };
         } else {
           result = { succeeded: false, info: 'Sub task information is null.' };
@@ -342,16 +359,202 @@ export default class BoardSocket {
 
     socket.on('remove sub task', async (data: any, fn: any) => {
       const boardId = Object.keys(socket.rooms)[0]; 
-      const taskId = Object.keys(socket.rooms)[2];
+      const taskRoom = Object.keys(socket.rooms)[2];
       console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove sub task');
       let result: any = {};
       try {  
         if (data.subTaskId) {
-          const subTask = this.subTaskService.remove(data.subTaskId);
-          this.nsp.to(taskId).emit('remove sub task', { subTaskId: data.subTaskId });
+          this.subTaskService.remove(data.subTaskId);
+          this.nsp.to(taskRoom).emit('remove sub task', { subTaskId: data.subTaskId });
           result = { succeeded: true, info: 'Remove sub task successfully.' };
         } else {
           result = { succeeded: false, info: 'Sub task id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('create comment', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'create comment');
+      let result: any = {};
+      try {  
+        if (data.comment) {
+          const comment = await this.commentService.create(data.comment);
+          this.nsp.to(taskRoom).emit('create comment', { comment });
+          result = { succeeded: true, info: 'Create comment successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Comment information is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('remove comment', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove comment');
+      let result: any = {};
+      try {  
+        if (data.commentId) {
+          this.commentService.remove(data.commentId);
+          this.nsp.to(taskRoom).emit('remove comment', { commentId: data.commentId });
+          result = { succeeded: true, info: 'Remove comment successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Comment id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('add member', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'add member');
+      let result: any = {};
+      try {  
+        if (data.userId) {
+          this.taskService.addMember(data.userId, +taskRoom.split('_')[1]);
+          this.nsp.to(taskRoom).emit('add member', { userId: data.userId });
+          result = { succeeded: true, info: 'Add task member successfully.' };
+        } else {
+          result = { succeeded: false, info: 'User id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('remove member', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove member');
+      let result: any = {};
+      try {  
+        if (data.userId) {
+          this.taskService.removeMember(data.userId, +taskRoom.split('_')[1]);
+          this.nsp.to(taskRoom).emit('remove member', { userId: data.userId });
+          result = { succeeded: true, info: 'Remove task member successfully.' };
+        } else {
+          result = { succeeded: false, info: 'User id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('create tag', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'create tag');
+      let result: any = {};
+      try {  
+        if (data.tag) {
+          const tag = await this.tagService.create({ ...data.tag, boardId });
+          this.nsp.to(boardId).emit('create tag', { tag });
+          result = { succeeded: true, info: 'Create tag successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Tag information is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('update tag', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'update tag');
+      let result: any = {};
+      try {  
+        if (data.tag) {
+          this.tagService.update(data.tag);
+          this.nsp.to(boardId).emit('update tag', { tag: data.tag });
+          result = { succeeded: true, info: 'Update tag successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Tag information is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('remove tag', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove tag');
+      let result: any = {};
+      try {  
+        if (data.tagId) {
+          this.tagService.remove(data.tagId);
+          this.nsp.to(boardId).emit('remove tag', { tagId: data.tagId });
+          result = { succeeded: true, info: 'Remove tag successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Tag id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('add task tag', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'add task tag');
+      let result: any = {};
+      try {  
+        if (data.tagId) {
+          this.taskService.addTag(data.tagId, +taskRoom.split('_')[1]);
+          this.nsp.to(taskRoom).emit('add task tag', { tagId: data.tagId });
+          result = { succeeded: true, info: 'Add task tag successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Tag id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('remove task tag', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove task tag');
+      let result: any = {};
+      try {  
+        if (data.tagId) {
+          this.taskService.removeTag(data.tagId, +taskRoom.split('_')[1]);
+          this.nsp.to(taskRoom).emit('remove task tag', { tagId: data.tagId });
+          result = { succeeded: true, info: 'Remove task tag successfully.' };
+        } else {
+          result = { succeeded: false, info: 'Tag id is null.' };
         }
       } catch (err) {
         console.error(err);

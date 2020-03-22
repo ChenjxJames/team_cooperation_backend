@@ -1,5 +1,5 @@
 import { Connection } from "none-sql";
-import { MySqlPool } from "../lib/MySql";
+import { MySqlPool } from "../lib/mysql";
 
 export interface Task {
   taskId: number;
@@ -82,10 +82,67 @@ export default class TaskImpl implements Task {
     try {
       await this.connection.transaction(async () => {
         let sql = 'DELETE FROM `task` WHERE `task_id` = ?';
-        await this.connection.query(sql, [taskId]);          
+        await this.connection.query(sql, [taskId]);       
+        sql = 'DELETE FROM `task_user` WHERE `task_id` = ?';
+        await this.connection.query(sql, [taskId]);       
       });
     } catch (err) {
       throw err;
     }
   }
+
+  async queryMember(taskId: number) {
+    try {
+      const sql = 'SELECT `user_id` AS `userId` FROM `task_user` WHERE `task_id`=?';
+      return (await this.connection.query(sql, [taskId])).info;    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addMember(userId: number, taskId: number) {
+    try {
+      const sql = 'INSERT INTO `task_user` (`user_id`, `task_id`) VALUES (?,?)';
+      await this.connection.query(sql, [userId, taskId]);    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeMember(userId: number, taskId: number) {
+    try {
+      const sql = 'DELETE FROM `task_user` WHERE `user_id` = ? AND `task_id` = ?';
+      await this.connection.query(sql, [userId, taskId]);    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryTag(taskId: number) {
+    try {
+      const sql = 'SELECT `tag_id` AS `tagId` FROM `task_tag` WHERE `task_id`=?';
+      return (await this.connection.query(sql, [taskId])).info;    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addTag(tagId: number, taskId: number) {
+    try {
+      const sql = 'INSERT INTO `task_tag` (`tag_id`, `task_id`) VALUES (?,?)';
+      await this.connection.query(sql, [tagId, taskId]);    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeTag(tagId: number, taskId: number) {
+    try {
+      const sql = 'DELETE FROM `task_tag` WHERE `tag_id` = ? AND `task_id` = ?';
+      await this.connection.query(sql, [tagId, taskId]);    
+    } catch (err) {
+      throw err;
+    }
+  }
+
 }

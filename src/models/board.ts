@@ -1,5 +1,5 @@
 import { Connection } from 'none-sql';
-import { MySqlPool } from '../lib/MySql';
+import { MySqlPool } from '../lib/mysql';
 
 interface Board {
   teamId: number;
@@ -11,7 +11,6 @@ interface Board {
 interface Boards {
   boards: Array<Board>;
 }
-
 
 export class BoardImpl implements Boards {
   boards: Board[] = [];

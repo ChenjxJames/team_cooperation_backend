@@ -1,5 +1,5 @@
 import { Connection } from 'none-sql';
-import { MySqlPool } from '../lib/MySql';
+import { MySqlPool } from '../lib/mysql';
 
 interface Organization {
   _organization_id: number;

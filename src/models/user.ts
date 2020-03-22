@@ -1,5 +1,5 @@
 import { Connection } from 'none-sql';
-import { MySqlPool } from '../lib/MySql';
+import { MySqlPool } from '../lib/mysql';
 
 interface User {
   _user_id: number;

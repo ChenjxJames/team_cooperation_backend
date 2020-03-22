@@ -30,4 +30,52 @@ export class TaskService {
       throw err;
     }
   }
+
+  async queryMember(taskId: number) {
+    try {
+      return await this.task.queryMember(taskId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addMember(userId: number, taskId: number) {
+    try {
+      return await this.task.addMember(userId, taskId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeMember(userId: number, taskId: number) {
+    try {
+      return await this.task.removeMember(userId, taskId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryTag(taskId: number) {
+    try {
+      return await this.task.queryTag(taskId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addTag(tagId: number, taskId: number) {
+    try {
+      return await this.task.addTag(tagId, taskId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeTag(tagId: number, taskId: number) {
+    try {
+      return await this.task.removeTag(tagId, taskId);   
+    } catch (err) {
+      throw err;
+    }
+  }
 }

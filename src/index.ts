@@ -8,7 +8,7 @@ import session from 'koa-session';
 import { MainRouter } from './routers/main';
 import { SESSION_CONFIG, MYSQL_CONFIG } from './config/db';
 import { RUN_CONFIG } from './config/index';
-import { MySqlPool } from './lib/MySql';
+import { MySqlPool } from './lib/mysql';
 import loginFilter from './lib/loginFilter';
 import log from './lib/log';
 import Socket from './socket/main';

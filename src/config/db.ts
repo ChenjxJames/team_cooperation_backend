@@ -27,5 +27,5 @@ export const MYSQL_CONFIG = {
   username: 'root',
   password: '',
   host: 'localhost',
-  connectionLimit: 20
+  connectionLimit: 30
 };
