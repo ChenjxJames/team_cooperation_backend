@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "koa": "^2.11.0",
-    "koa-bodyparser": "^3.2.0",
+    "koa-body": "^4.1.1",
     "koa-router": "^7.4.0",
     "koa-session": "^5.12.3",
     "md5": "^2.2.1",
@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
-    "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.0.42",
     "@types/koa-session": "^5.10.1",
     "@types/md5": "^2.1.33",

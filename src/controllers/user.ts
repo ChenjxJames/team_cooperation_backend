@@ -58,7 +58,7 @@ export class UserControl {
 
   register = async (ctx: any) => {
     try {
-      let requestBody = ctx.request.body
+      let requestBody = ctx.request.body;
       if (requestBody.password === requestBody.passwordAffirm && requestBody.username && requestBody.email) {
         if(await this.userService.register(requestBody.username, requestBody.password, requestBody.email)) {
           ctx.body = { succeeded: true, info: 'Register successfully.' };
@@ -81,7 +81,7 @@ export class UserControl {
 
   changePassword = async (ctx: any) => {
     try {
-      let requestBody = ctx.request.body
+      let requestBody = ctx.request.body;
       if (requestBody.password === requestBody.passwordAffirm) {
         if(await this.userService.changePassword(ctx.session.username, requestBody.password)) {
           ctx.body = { succeeded: true, info: 'Change password successfully.' };
@@ -117,7 +117,7 @@ export class UserControl {
 
   getUsernameById = async (ctx: any) => {
     try {
-      let requestBody = ctx.request.body
+      let requestBody = ctx.request.body;
       if (requestBody.user_id) {
         ctx.body = { succeeded: true, info: 'Get successfully.', data: await this.userService.getUsernameById(requestBody.user_id)};
       } else {
@@ -131,7 +131,7 @@ export class UserControl {
 
   resetPassword = async (ctx: any) => {
     try {
-      let requestBody = ctx.request.body
+      let requestBody = ctx.request.body;
       if (requestBody.password === requestBody.passwordAffirm && requestBody.user_id && requestBody.username && requestBody.verification_code) {
         if(await this.userService.resetPassword(requestBody.user_id, requestBody.username, requestBody.password, requestBody.verification_code)) {
           ctx.body = { succeeded: true, info: 'Reset password successfully.' };

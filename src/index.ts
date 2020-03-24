@@ -2,8 +2,9 @@ import Koa from 'koa';
 import socketIo from 'socket.io';
 import http from 'http';
 import { createServer } from 'http';
-import bodyParser from 'koa-bodyparser';
 import session from 'koa-session';
+import koaBody from 'koa-body';
+import path from 'path';
 
 import { MainRouter } from './routers/main';
 import { SESSION_CONFIG, MYSQL_CONFIG } from './config/db';
@@ -23,7 +24,13 @@ const mainRouter = new MainRouter();
 app.keys = ['vEiC37Y8CtJPh6Q6'];
 
 app.use(session(SESSION_CONFIG, app));  // 加载session中间件
-app.use(bodyParser());  // 加载post请求数据解析中间件
+app.use(koaBody({
+  multipart: true,
+  formidable: {
+    keepExtensions: true,    // 保持文件的后缀
+    maxFileSize: 1024*1024*1024    // 设置上传文件大小最大限制为1GB
+  }
+}));// 加载请求数据解析中间件
 app.use(log);  // 加载日志中间件
 app.use(loginFilter);  // 加载登录验证拦截器中间件
 app.use(mainRouter.router.routes()).use(mainRouter.router.allowedMethods());  // 加载路由中间件

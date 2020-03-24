@@ -6,6 +6,7 @@ import { OrganizationRouter } from './organization';
 import { PermissionRouter } from './permission';
 import { BoardRouter } from './board';
 import { TeamRouter } from './team';
+import { FileRouter } from './file';
 
 export class MainRouter {
   router = new Router();
@@ -18,6 +19,7 @@ export class MainRouter {
     let permissionRouter = new PermissionRouter();
     let boardRouter = new BoardRouter();
     let teamRouter = new TeamRouter();
+    let fileRouter = new FileRouter();
     home.get('/', mainContorl.main);
     this.router.use('/', home.routes(), home.allowedMethods());
     this.router.use('/user', userRouter.router.routes(), userRouter.router.allowedMethods());
@@ -25,5 +27,6 @@ export class MainRouter {
     this.router.use('/team', teamRouter.router.routes(), teamRouter.router.allowedMethods());
     this.router.use('/permission', permissionRouter.router.routes(), permissionRouter.router.allowedMethods());
     this.router.use('/board', boardRouter.router.routes(), boardRouter.router.allowedMethods());
+    this.router.use('/cloud', fileRouter.router.routes(), fileRouter.router.allowedMethods());
   }
 }
