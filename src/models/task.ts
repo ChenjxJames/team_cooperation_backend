@@ -145,4 +145,34 @@ export default class TaskImpl implements Task {
     }
   }
 
+  async queryFile(taskId: number) {
+    try {
+      const sql = 'SELECT `task_id` AS `taskId`, `file_id` AS `fileId`, `file_name` AS `fileName` FROM `task_file` WHERE `task_id`=?';
+      return (await this.connection.query(sql, [taskId])).info;    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addFile(taskId: number, files: any[]) {
+    try {
+      let sql = 'INSERT INTO `task_file` (`task_id`, `file_id`, `file_name`) VALUES ';
+      files.forEach((file: any) => {
+        sql+=`(${taskId},${file.fileId},'${file.fileName}'),`;
+      });
+      sql = sql.substring(0,sql.length-1);
+      await this.connection.query(sql, []);    
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeFile(taskId: number, fileId: number) {
+    try {
+      const sql = 'DELETE FROM `task_file` WHERE `task_id` = ? AND `file_id` = ?';
+      await this.connection.query(sql, [taskId, fileId]);    
+    } catch (err) {
+      throw err;
+    }
+  }
 }

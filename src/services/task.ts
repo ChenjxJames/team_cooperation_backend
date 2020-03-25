@@ -78,4 +78,29 @@ export class TaskService {
       throw err;
     }
   }
+
+  async queryFile(taskId: number) {
+    try {
+      return await this.task.queryFile(taskId);   
+    } catch (err) {
+      throw err;
+    }
+  }
+
+
+  async addFile(taskId: number, files: any[])  {
+    try {
+      return await this.task.addFile(taskId, files);   
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeFile(taskId: number, fileId: number)  {
+    try {
+      return await this.task.removeFile(taskId, fileId);   
+    } catch (err) {
+      throw err;
+    }
+  }
 }

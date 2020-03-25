@@ -14,6 +14,14 @@ export class FileService {
       throw err;
     }
   }
+
+  async getInformationByFileId(fileId: number) {
+    try {
+      return await this.file.getInformationByFileId(fileId);
+    } catch (err) {
+      throw err;
+    }
+  }
   
   async getInformationByUserId(userId: number, folderId: number) {
     try {
@@ -71,19 +79,35 @@ export class FileService {
     }
   }
 
-  async addFileShare(fileId: number, shareUser: number, createUser: number) {
+  async getFileSharedWithMe(userId: number) {
     try {
-      return await this.file.addFileShare(fileId, shareUser, createUser);
+      return await this.file.getFileSharedWithMe(userId);
     } catch (err) {
       throw err;
     }
   }
 
-  async removeFileShare(fileId: number, shareUser: number, createUser: number) {
+  async addFileShare(fileId: number, fileName: string, shareUser: number, createUser: number) {
     try {
-      return await this.file.removeFileShare(fileId, shareUser, createUser);
+      return await this.file.addFileShare(fileId, fileName, shareUser, createUser);
     } catch (err) {
       throw err;
     }
   }
+
+  async saveShareFile(files: any[], folderId: number, shareUser: number) {
+    try {
+      return await this.file.saveShareFile(files, folderId, shareUser);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async removeFileShare(files: any[], shareUser: number) {
+    try {
+      return await this.file.removeFileShare(files, shareUser);
+    } catch (err) {
+      throw err;
+    }
+  } 
 }

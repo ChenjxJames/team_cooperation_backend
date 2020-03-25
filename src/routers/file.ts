@@ -14,7 +14,11 @@ export class FileRouter {
     .post('/remove', control.remove)
     .post('/update', control.update)
     .post('/setFolder', control.setFolder)
-    .post('download', control.download)
+    .post('/share', control.share)
+    .post('/download', control.download)
+    .post('/shareWithMe/save', control.saveShareFile)
+    .post('/shareWithMe/remove', control.removeFileShare)
+    .get('/shareWithMe', control.shareWithMe)
     .get('/:id', control.getInformation);
   }
   

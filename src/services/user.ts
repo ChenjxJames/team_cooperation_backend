@@ -111,6 +111,17 @@ export class UserService {
     });
   }
 
+  async getUserIdByEmail(email: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.userImpl.getUserByEmail(email);
+        resolve(this.userImpl.user_id);
+      } catch (err) {
+        reject("Email is error");
+      }
+    });
+  }
+
   encrypt(plaintext: string): string {
     return md5(plaintext + SALT);
   }

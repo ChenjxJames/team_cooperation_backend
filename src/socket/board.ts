@@ -284,6 +284,9 @@ export default class BoardSocket {
           if (data.task.haveTag) {
             resultData.taskTags = await this.taskService.queryTag(data.task.taskId);
           }
+          if (data.task.haveFile) {
+            resultData.taskFiles = await this.taskService.queryFile(data.task.taskId);
+          }
           result = { succeeded: true, info: 'Join task room successfully.', data: resultData };
         } else {
           result = { succeeded: false, info: 'Task information is null.' };
@@ -555,6 +558,48 @@ export default class BoardSocket {
           result = { succeeded: true, info: 'Remove task tag successfully.' };
         } else {
           result = { succeeded: false, info: 'Tag id is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('add file', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'add file');
+      let result: any = {};
+      try {  
+        if (data.files) {
+          this.taskService.addFile(+taskRoom.split('_')[1], data.files);
+          this.nsp.to(taskRoom).emit('add file', { files: data.files});
+          result = { succeeded: true, info: 'Add file successfully.' };
+        } else {
+          result = { succeeded: false, info: 'File information is null.' };
+        }
+      } catch (err) {
+        console.error(err);
+        result = { succeeded: false, info: 'Server error.', error: err };
+      } finally {
+        fn(result);
+      }
+    });
+
+    socket.on('remove file', async (data: any, fn: any) => {
+      const boardId = Object.keys(socket.rooms)[0]; 
+      const taskRoom = Object.keys(socket.rooms)[2];
+      console.log((new Date()).toLocaleString(), 'userID_'+userId, 'socket', boardId, 'remove file');
+      let result: any = {};
+      try {  
+        if (data.fileId) {
+          this.taskService.removeFile(+taskRoom.split('_')[1], data.fileId);
+          this.nsp.to(taskRoom).emit('remove file', { fileId: data.fileId});
+          result = { succeeded: true, info: 'Remove file successfully.' };
+        } else {
+          result = { succeeded: false, info: 'File id is null.' };
         }
       } catch (err) {
         console.error(err);

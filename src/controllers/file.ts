@@ -2,12 +2,15 @@ import path from 'path';
 import fs from 'fs';
 
 import { FileService } from '../services/file';
+import { UserService } from '../services/user';
 
 export class FileControl {
   fileService: FileService;
+  userService: UserService;
   
   constructor() {
     this.fileService = new FileService();
+    this.userService = new UserService();
   }
 
   getInformation = async (ctx: any) => {
@@ -90,7 +93,7 @@ export class FileControl {
       if (fileIds.length) {    
         await this.fileService.removeUserFile(fileIds, ctx.session.user_id, folderId);  
         const result: any = await this.fileService.remove(fileIds);
-        result.forEach((item: { fileId: number, fileType: string, path: string}) => {
+        result.forEach((item: any) => {
           if (item.fileType !== 'folder') {
             fs.unlink(item.path, (err: any) => {
               if (err) { throw new Error(err); }
@@ -144,6 +147,92 @@ export class FileControl {
   }
 
   download = async (ctx: any) => {
+    try{
+      let requestBody = ctx.request.body
+      const fileId = requestBody.fileId;
+      const fileName = requestBody.fileName;
+      if (fileId && fileName) {   
+        const filePath = (await this.fileService.getInformationByFileId(fileId)).path;        
+        const stats = fs.statSync(filePath);
+        ctx.set('Content-Type', 'application/octet-stream');
+        ctx.set('Content-Disposition', 'attachment; filename=' + fileName);
+        ctx.set('Content-Length', stats.size);
+        ctx.body = fs.createReadStream(filePath);
+      } else {
+        ctx.body = { succeeded: false, info: 'File id is null.' };
+      }
+    } catch (err) {
+      console.error(err);
+      ctx.body = { succeeded: false, info: 'Server error.', error: err };
+    }
+  }
+  
+  share = async (ctx: any) => {
+    try{
+      let requestBody = ctx.request.body
+      const fileId = requestBody.fileId;
+      const fileName = requestBody.fileName;
+      const email = requestBody.email;
+      if (fileId && fileName && email) {    
+        const shareUser = await this.userService.getUserIdByEmail(email);
+        if (typeof shareUser === 'number') {
+          await this.fileService.addFileShare(fileId, fileName, shareUser, ctx.session.user_id);
+          ctx.body = { succeeded: true, info: 'File share successfully.' };
+        }
+      } else {
+        ctx.body = { succeeded: false, info: 'File information is null.' };
+      }
+    } catch (err) {
+      console.error(err);
+      if (err === "Email is error") {
+        ctx.body = { succeeded: false, info: 'The corresponding user of this email was not found.'  };
+      } else {
+        ctx.body = { succeeded: false, info: 'Server error.', error: err };
+      }      
+    }
+  }
 
+  shareWithMe = async (ctx: any) => {
+    try{
+      const userId = ctx.session.user_id;
+      const result = await this.fileService.getFileSharedWithMe(userId);
+      ctx.body = { succeeded: true, info: 'Successfully get file shared with me.', data: result};
+    } catch (err) {
+      console.error(err);
+      ctx.body = { succeeded: false, info: 'Server error.', error: err };
+    }
+  }
+
+  saveShareFile = async (ctx: any) => {
+    try {
+      let requestBody = ctx.request.body;
+      const files = requestBody.files;
+      const folderId = requestBody.folderId;
+      if (files.length && typeof(folderId) !== "undefined") {        
+        await this.fileService.saveShareFile(files, folderId, ctx.session.user_id);
+        ctx.body = { succeeded: true, info: 'Save file successfully.' };
+      } else {
+        ctx.body = { succeeded: false, info: 'File information is null.' };
+      }
+    } catch (err) {
+      console.error(err);
+      ctx.body = { succeeded: false, info: 'Server error.', error: err };
+    }
+  }
+
+  removeFileShare = async (ctx: any) => {
+    try {
+      let requestBody = ctx.request.body;
+      const files = requestBody.files;
+      if (files.length) {        
+        await this.fileService.removeFileShare(files, ctx.session.user_id);
+        ctx.body = { succeeded: true, info: 'Remove file share successfully.' };
+      } else {
+        ctx.body = { succeeded: false, info: 'File information is null.' };
+      }
+    } catch (err) {
+      console.error(err);
+      ctx.body = { succeeded: false, info: 'Server error.', error: err };
+    }
   }
 }

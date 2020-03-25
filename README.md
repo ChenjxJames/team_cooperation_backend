@@ -1,28 +1,16 @@
 # Team Cooperation Backend
 
 * modules
-    * kanban
-    * calendar
-    * user_manage
-    * document_manage
-    * drive
+  * kanban
+  * calendar
+  * organization
+  * team
+  * cloud
 
-* api
-    * base
-        * login  
+* Run  
+  1. set /config/db.ts 
+  2. install node.js v12.13.0
+  3. ```cd /this_dir```
+  4. ```npm install```
+  5. ```npm start```
 
-        | url  | method | request body | response |
-        |  ----  | ----  | ----  | ----  |
-        | /user/login | POST | { username: string,  password: string } | { succeed: boolean, info: string, obj?: any } |
-
-        * register
-        
-        | url  | method | request body | response |
-        |  ----  | ----  | ----  | ----  |
-        | /user/register | POST | { username: string,  password: string, passwordAttirm: string } | { succeed: boolean, info: string, obj?: any } |
-
-        * logout 
-
-        | url  | method | request body | response |
-        |  ----  | ----  | ----  | ----  |
-        | /user/logout | GET | {} | 'logout page!' |
