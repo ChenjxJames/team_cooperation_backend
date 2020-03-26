@@ -29,9 +29,10 @@ export default class CommentImpl implements Comment {
   async create(comment: any) {
     try {
       let sql = "INSERT INTO `task_comment` (`comment_content`, `task_id`, `user_id`) VALUES (?,?,?)";
-      const result: any = await this.connection.query(sql, [comment.commentContent, comment.taskId, comment.userId]); 
-      comment.commentId = result.info.insertId;
-      return comment;
+      let result: any = await this.connection.query(sql, [comment.commentContent, comment.taskId, comment.userId]); 
+      sql = "SELECT `comment_id` AS `commentId`, `comment_content` AS `commentContent`, `task_id` AS `taskId`, `task_comment`.`create_time` AS `createTime`, `user_id` AS `userId`, `username` FROM `task_comment` LEFT JOIN `user` USING(`user_id`) WHERE `comment_id`=?";
+      result = (await this.connection.query(sql, [result.info.insertId])).info[0];
+      return result;
     } catch (err) {
       throw err;
     }
