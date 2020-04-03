@@ -4,7 +4,6 @@ import http from 'http';
 import { createServer } from 'http';
 import session from 'koa-session';
 import koaBody from 'koa-body';
-import path from 'path';
 
 import { MainRouter } from './routers/main';
 import { SESSION_CONFIG, MYSQL_CONFIG } from './config/db';
