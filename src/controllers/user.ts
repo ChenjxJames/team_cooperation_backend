@@ -76,7 +76,7 @@ export class UserControl {
 
   logout = async(ctx: any) => {
     ctx.session = null;
-    ctx.body = { succeeded: false, info: 'Logout successfully.' };
+    ctx.body = { succeeded: true, info: 'Logout successfully.' };
   }
 
   changePassword = async (ctx: any) => {
