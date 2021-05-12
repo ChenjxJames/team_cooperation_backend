@@ -17,7 +17,7 @@
     "koa-session": "^5.12.3",
     "md5": "^2.2.1",
     "mongoose": "^5.7.12",
-    "nodemailer": "^6.4.2",
+    "nodemailer": "^6.4.16",
     "none-sql": "^1.2.2",
     "socket.io": "^2.3.0"
   },
